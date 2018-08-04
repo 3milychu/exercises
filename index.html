@@ -96,11 +96,14 @@ customElements.define('img-holder', class extends HTMLElement {
 			overflow:hidden;
 			width:25%;
 			max-height:50vh;
+			top:0;
+			left:0;
+			line-height:0em;
 		}
 		::slotted( img ){
+			transition: 0.25s ease-in-out;
 			z-index:0;
-			width:150%;
-			margin:auto;
+			width:120%;
 			cursor:pointer;
 		}
 		</style>
@@ -112,6 +115,7 @@ customElements.define('img-holder', class extends HTMLElement {
 
 
 //Get photos from json and send to page
+var json;
 
 d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json', function(json){
 
@@ -127,8 +131,54 @@ d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json',
 		.attr("class", "image")
 		.attr("id", function(d) {return d.Index})
 		.attr("src", function(d) {return "pics/" + d.img_name})
+		.on("mouseover", zoom)
+		.on("mouseout", zoomout)
 		.exit()
+
+		// On escape or close button, remove lightbox slider
+		document.onkeydown = function(evt) {
+
+			console.log(json);
+			evt = evt || window.event;
+			if(evt.keyCode ==27 ) {
+				document.querySelector('lightbox-slider').style.display= "none";
+			} else if (evt.keyCode == 39){
+				el = document.querySelector('lightbox-slider img')
+				currentImg = el.id;
+				console.log(currentImg);
+				
+				var index = json.findIndex(p => p.Index == currentImg)
+				var next = index+1;
+				el.id = next;
+
+				nextSrc = json[next]['img_name'];
+
+				el.src = "pics/"+ nextSrc;
+			} else if (evt.keyCode == 37){
+				el = document.querySelector('lightbox-slider img')
+				currentImg = el.id;
+				console.log(currentImg);
+				
+				var index = json.findIndex(p => p.Index == currentImg)
+				var next = index-1;
+				el.id = next;
+
+				nextSrc = json[next]['img_name'];
+
+				el.src = "pics/"+ nextSrc;
+			}
+
+		}
+
 })
+
+function zoom () {
+	this.style.width= "200%";
+}
+
+function zoomout () {
+	this.style.width= "150%";
+}
 
 // When click on an image, pop up the image in lightbox-slider
 
@@ -145,6 +195,7 @@ document.body.addEventListener("click", function () {
 			lightbox.innerHTML = "";
 			lightbox.style.display="block";
 			var elem = document.createElement('img');
+			elem.id = this.id;
 			elem.src = this.src;
 			document.querySelector('lightbox-slider').appendChild(elem);
 
@@ -152,13 +203,6 @@ document.body.addEventListener("click", function () {
 	}
 })
 
-// On escape or close button, remove lightbox slider
-document.onkeydown = function(evt) {
-	evt = evt || window.event;
-	if(evt.keyCode ==27 ) {
-		document.querySelector('lightbox-slider').style.display= "none";
-	}
-}
 
 
 </script>
