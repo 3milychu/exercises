@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Real Brooklyn Photos</title>
+	<script src = "https://d3js.org/d3.v4.js"></script>
+<style>
+html {
+	left:0;
+	top:0;
+	margin:0;
+	padding:0;
+	width:100%;
+}
+</style>
+
+</head>
+
+<body>
+
+	<header></header>
+	<featured-slider></featured-slider>
+	<photo-collage></photo-collage>
+
+</body>
+
+<script>
+//Define custom elements
+customElements.define('featured-slider', class extends HTMLElement {
+	constructor(){
+		super();
+		this.attachShadow({mode:"open"}).innerHTML = `
+		<style>
+		:host {
+			width:100%;
+			background-color:grey;
+			display:block;
+		}
+		</style>
+		<slot></slot>
+		`;
+	}
+})
+
+customElements.define('photo-collage', class extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({mode:"open"}).innerHTML = `
+		<style>
+		:host {
+			width:100%;
+			height:auto;
+		}
+		::slotted( img ){
+			width:25%;
+		}
+		</style>
+		<slot></slot>
+		`;
+	}
+})
+
+//Get photos from json and send to page
+
+d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json', function(json){
+	d3.select('photo-collage').selectAll('photo-collage')
+		.data(json)
+		.enter()
+		.append('img')
+		.attr("id", function(d) {return d.Index})
+		.exit()
+})
+
+
+</script>
+
+</html>
