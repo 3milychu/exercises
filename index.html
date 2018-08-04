@@ -67,6 +67,7 @@ d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json',
 		.enter()
 		.append('img')
 		.attr("id", function(d) {return d.Index})
+		.attr("src", function(d) {return "../pics/" + d.img_name})
 		.exit()
 })
 
