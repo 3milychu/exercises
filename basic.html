@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Basic Prompts</title>
+<style>
+
+</style>
+</head>
+
+<body>
+
+</body>
+
+<script>
+
+//Write a program that prints ‘Hello World’ to the screen.
+var greeting = document.createElement('h1');
+greetingText = "Hello World!";
+greeting.innerHTML = greetingText;
+document.body.appendChild(greeting);
+
+//Write a program that asks the user for their name and greets them with their name.
+
+var form = document.createElement('div');
+document.body.appendChild(form);
+var name_text = document.createElement('h2');
+name_text.innerHTML = "What's your name?";
+form.appendChild(name_text);
+var name_input = document.createElement('input');
+form.appendChild(name_input);
+var name_submit = document.createElement('button');
+name_submit.innerHTML = 'Submit';
+form.appendChild(name_submit);
+response = document.createElement('p');
+document.body.appendChild(response);
+
+name_submit.addEventListener("click", function() {
+
+	// name = name_input.value;
+	// response.innerHTML = "Hi " + name + "!";
+
+	//Modify the previous program such that only the users Alice and Bob are greeted with their names.
+	if (name_input.value == "Alice" || name_input.value == "Bob"){
+		name = name_input.value;
+		response.innerHTML = "Hi " + name + "!";
+	} else {
+		no_name = "";
+		response.innerHTML = no_name;
+	};
+})
+
+//Write a program that asks the user for a number n and prints the sum of the numbers 1 to n
+var numbersGame = document.createElement('div');
+numbersGame.setAttribute("id", "numbers-game");
+document.body.append(numbersGame);
+
+var numbers_text = document.createElement('h2');
+numbers_text.innerHTML = "Choose a number greater than 1"
+numbersGame.appendChild(numbers_text);
+
+var numbers_input = document.createElement('input');
+numbersGame.appendChild(numbers_input);
+
+var numbers_submit = document.createElement('button');
+numbers_submit.innerHTML = "Submit";
+numbersGame.appendChild(numbers_submit);
+
+var numbers_response = document.createElement('p');
+numbersGame.appendChild(numbers_response);
+
+
+//Write a program that asks the user for a number n and prints the sum of the numbers 1 to n
+// numbers_submit.addEventListener("click", function() {
+// 	n = numbers_input.value;
+// 	list_to_sum = range(1, n);
+// 	sum = list_to_sum.reduce((a,b)=>a+b,0)
+// 	numbers_response.innerHTML = "The sum of 1 to " + n + " is " + sum;
+// })
+
+function range(start, end) {
+	list = [];
+	for (i=start;i<=end;i++){
+		list.push(i);
+	}
+	return list;
+}
+
+function three_five_multiples_range(start, end) {
+	list = [];
+	for (i=start;i<=end;i++){
+		if(i % 5 === 0 || i % 3 === 0)
+		list.push(i);
+	};
+
+	return list;
+}
+
+//Modify the previous program such that only multiples of three or five are considered in the sum
+
+numbers_submit.addEventListener("click", function() {
+
+	n = numbers_input.value;
+	list_to_sum = three_five_multiples_range(1, n);
+	sum = list_to_sum.reduce((a,b) => a+b, 0)
+	console.log(list_to_sum);
+	numbers_response.innerHTML = "The sum of numbers divisible by 3 or 5 between 1 to " + n + " is " + sum;
+})
+
+</script>
+</html>
