@@ -5,6 +5,7 @@
 	<script src = "https://d3js.org/d3.v4.js"></script>
 <style>
 html {
+	font-family:'Helvetica-Neue',sans-serif;
 	left:0;
 	top:0;
 	margin:0;
@@ -12,7 +13,6 @@ html {
 	width:100%;
 }
 h1 {
-	font-family:'Helvetica-Neue',sans-serif;
 	font-weight:900;
 	width:20%;
 	margin:1%;
@@ -21,6 +21,19 @@ h1 {
 	padding:1% 2%;
 	line-height:1em;
 	letter-spacing:-0.05em;
+	display:inline-block;
+}
+
+h2 {
+	display:inline-block;
+	float:right;
+	margin-top:5%;
+	font-weight:100;
+}
+
+em {
+	font-weight:900;
+	display:inline-block;
 }
 
 header {
@@ -35,6 +48,7 @@ header {
 
 	<header>
 		<h1>Real Brooklyn Photos</h1>
+		<h2>Real Recognize Real<em>.</em></h2>
 	</header>
 
 	<lightbox-slider></lightbox-slider>
@@ -101,7 +115,7 @@ customElements.define('img-holder', class extends HTMLElement {
 			line-height:0em;
 		}
 		::slotted( img ){
-			transition: 0.25s ease-in-out;
+			transition: 1s ease-in-out;
 			z-index:0;
 			width:120%;
 			cursor:pointer;
@@ -116,6 +130,18 @@ customElements.define('img-holder', class extends HTMLElement {
 
 //Get photos from json and send to page
 var json;
+
+// Pure JS method
+
+// var xttp = new XMLHttpRequest();
+// xttp.open("GET", 'https://raw.githubusercontent.com/3milychu/exercises/master/file.json', true);
+// xttp.send();
+// xttp.onreadystatechange = function() {
+// 	if(this.readyState == 4 && this.status == 200) {
+// 		json = JSON.parse(this.responseText);
+// };
+
+// d3 method
 
 d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json', function(json){
 
@@ -159,13 +185,13 @@ d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json',
 				currentImg = el.id;
 				console.log(currentImg);
 				
-				var index = json.findIndex(p => p.Index == currentImg)
+				var index = json.findIndex(d => d.Index == currentImg)
 				var next = index-1;
-				el.id = next;
 
 				nextSrc = json[next]['img_name'];
 
 				el.src = "pics/"+ nextSrc;
+				el.id = next;
 			}
 
 		}
@@ -173,11 +199,11 @@ d3.json('https://raw.githubusercontent.com/3milychu/exercises/master/file.json',
 })
 
 function zoom () {
-	this.style.width= "200%";
+	this.style.transform= "scale(1.5,1.5)";
 }
 
 function zoomout () {
-	this.style.width= "150%";
+	this.style.transform= "scale(1,1)";
 }
 
 // When click on an image, pop up the image in lightbox-slider

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://d3js.org/d3.v4.js"></script>
+<style>
+</style>
+</head>
+
+<body>
+
+	<bar-graph>
+		<h1>Bar Graph</h1>
+		<svg id="bar"></svg>
+	</bar-graph>
+
+	<scatter-graph>
+		<h1>Scatter Graph></h1>
+		<svg id="scatter"></svg>
+	</scatter-graph>
+
+	<line-graph>
+		<h1>Line Graph</h1>
+		<svg id="line"></svg>
+	</line-graph>
+
+</body>
+
+<script>
+
+//Define custom elements
+
+customElements.define('bar-graph', class extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({mode:"open"}).innerHTML = `
+		<style>
+		:host {
+			display:block;
+		}
+		</style>
+		`;
+	}
+})
+
+customElements.define('scatter-graph', class extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({mode:"open"}).innerHTML = `
+		<style>
+		:host {
+			display:block;
+		}
+		</style>
+		`;
+	}
+})
+
+customElements.define('line-graph', class extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({mode:"open"}).innerHTML = `
+		<style>
+		:host {
+			display:block;
+		}
+		</style>
+		`;
+	}
+})
+
+// Create bar chart
+
+getBarChart();
+
+
+function getBarChart () {
+
+	var xttp = new XMLHttpRequest();
+	xttp.open("GET", 'https://raw.githubusercontent.com/aaronxhill/uncertainty/master/art/art.json', true);
+	xttp.send();
+	xttp.onreadystatechange = function () {
+		if(this.readyState == 4 && this.status == 200 ){
+			df = JSON.parse(this.responseText);
+
+			groupByArtMovement = d3.nest() 
+				.key(function(d){return d.art_movement})
+				.entries(df)
+
+			countByArtMovement = d3.nest()
+				.key(function(d){return d.art_movement})
+				.rollup(function(v){return v.length})
+				.object(df)
+
+			console.log(groupByArtMovement);
+			console.log(countByArtMovement);
+
+		}
+	}
+
+}
+
+
+</script>
+
+</html>
