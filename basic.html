@@ -101,9 +101,10 @@ numbers_submit.addEventListener("click", function() {
 
 	n = numbers_input.value;
 	list_to_sum = three_five_multiples_range(1, n);
-	sum = list_to_sum.reduce((a,b) => a+b, 0)
+	sum = list_to_sum.reduce(function(a,b){return a+b;})
+	product = list_to_sum.reduce(function(a,b){return a*b;})
 	console.log(list_to_sum);
-	numbers_response.innerHTML = "The sum of numbers divisible by 3 or 5 between 1 to " + n + " is " + sum;
+	numbers_response.innerHTML = "The sum of numbers divisible by 3 or 5 between 1 to " + n + " is " + sum + "<br> The product is " + product;
 })
 
 </script>

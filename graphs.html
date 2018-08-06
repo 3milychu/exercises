@@ -4,13 +4,60 @@
 	<title></title>
 	<script src="https://d3js.org/d3.v4.js"></script>
 <style>
+
+body {
+	font:'Helvetica-Neue', sans-serif;
+}
+
+svg {
+	width:100%;
+	height:60vh;
+}
+
+.tooltip {
+  position: absolute;
+  text-align: center;
+  width: auto;
+  height: auto;
+  padding: 2%;
+  font: 12px sans-serif;
+  background: #F2F2F2;
+  border: 0.05em solid black
+  border-radius: 1em;
+  pointer-events: none;
+}
+
+.bar {
+	fill:lightgrey;
+	z-index:1;
+}
+
+line {
+	stroke:white;
+}
+
+.domain {
+	stroke:white;
+}
+
+.grid line {
+	stroke:#F2F2F2;
+	z-index:0;
+
+}
+
+em {
+	font-style:normal;
+	font-weight:900;
+}
 </style>
 </head>
 
 <body>
 
 	<bar-graph>
-		<h1>Bar Graph</h1>
+		<h1>Responsive Bar Graph</h1>
+		<p>Items in Dataset by Art Movement</p>
 		<svg id="bar"></svg>
 	</bar-graph>
 
@@ -37,8 +84,14 @@ customElements.define('bar-graph', class extends HTMLElement {
 		<style>
 		:host {
 			display:block;
+			height:auto;
+			font-family:'Helvetica-Neue', sans-serif;
+			height:80%;
+			width:80%;
+			padding:5%;
 		}
 		</style>
+		<slot></slot>
 		`;
 	}
 })
@@ -73,27 +126,122 @@ customElements.define('line-graph', class extends HTMLElement {
 
 getBarChart();
 
+window.onresize = function () {
+	document.querySelector('#bar').innerHTML = "";
+	getBarChart();
+}
+
 
 function getBarChart () {
+
+	var svgWidth = document.querySelector('svg').clientWidth;
+		var svgHeight = document.querySelector('svg').clientHeight;
+		console.log(svgWidth);
+		console.log(svgHeight);
+
+	var margin = {top: 10, bottom: 100, right: 20, left:50},
+		width =  svgWidth - margin.left - margin.right,
+		height =  svgHeight - margin.top - margin.bottom;
+
+
+	var svg = d3.select('#bar')
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+	var x = d3.scaleBand()
+		.rangeRound([0, width])
+		.padding(0.1);
+
+	var y = d3.scaleLinear()
+		.rangeRound([height,0]);
+
+	var tooltip = d3.select('body').append("div")
+	    .attr("class", "tooltip")
+	    .style("opacity", 0);
+
 
 	var xttp = new XMLHttpRequest();
 	xttp.open("GET", 'https://raw.githubusercontent.com/aaronxhill/uncertainty/master/art/art.json', true);
 	xttp.send();
 	xttp.onreadystatechange = function () {
 		if(this.readyState == 4 && this.status == 200 ){
-			df = JSON.parse(this.responseText);
+			var df = JSON.parse(this.responseText);
 
-			groupByArtMovement = d3.nest() 
+			// The data structure
+			var groupByArtMovement = d3.nest() 
 				.key(function(d){return d.art_movement})
 				.entries(df)
+				.sort(function(a,b) {return d3.ascending(a.key,b.key);})
 
-			countByArtMovement = d3.nest()
+			var countByArtMovement = d3.nest()
 				.key(function(d){return d.art_movement})
 				.rollup(function(v){return v.length})
 				.object(df)
 
+			var groupByDate = d3.nest()
+				.key(function(d){return d.date})
+				.entries(df)
+
+
+			var countByDate = d3.nest()
+				.key(function(d){return d.date})
+				.rollup(function(d){return d.length})
+				.object(df)
+
 			console.log(groupByArtMovement);
-			console.log(countByArtMovement);
+
+			largestYear = Math.max.apply(null, countByDate);
+			largestYear = d3.max(df, function(d) {return d.date;})
+			
+
+			x.domain(groupByArtMovement.map(function(d){return d.key;}));
+			y.domain([0,d3.max(groupByArtMovement, function(d) {return d.values.length;})]);
+
+			svg.append("g")
+				.attr("transform", "translate(0," + height + ")")
+				.call(d3.axisBottom(x))
+					.selectAll('text')
+					.style("text-anchor", "end")
+					.attr("transform", "rotate(-65)");
+
+			function y_grid_lines() {
+				return d3.axisLeft(y)
+			}
+
+			svg.append("g")
+				.attr("class", "grid")
+				.call(y_grid_lines()
+					.tickSize(-width)
+					);
+
+			var bar = svg.selectAll('.bar')
+					.data(groupByArtMovement)
+					.enter()
+					.append('rect')
+					.attr("class", "bar")
+					.attr("x", function(d){return x(d.key);})
+					.attr("width", x.bandwidth())
+					.attr("y", function(d) {return y(d.values.length); })
+					.attr("height", function(d) {return height - y(d.values.length);})
+					.on("mouseover", function(d) {
+						this.style.fill = "lightblue";
+						tooltip.transition()
+				         .duration(100)
+				         .style("opacity", .9)
+				         .style("left", (d3.event.pageX + 20) + "px")
+				         .style("top", (d3.event.pageY - 50) + "px")
+				         tooltip.html("<em>" + d.key + ": " + d.values.length + "<em>");
+					})
+					.on("mouseout", function(d) {
+						this.style.fill = "lightgrey";
+						tooltip.transition()
+				         .duration(100)
+				         .style("opacity", 0)
+					})
+
+
 
 		}
 	}
